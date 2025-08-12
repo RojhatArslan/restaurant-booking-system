@@ -1,38 +1,33 @@
 name: Restaurant Project - Django CI
 
-#reference :
 on:
   push:   # Runs when I push code to GitHub
     branches: [main]
-  pull_request:   #  Runs when someone opens a pull request to merge code
+  pull_request:   # Runs when someone opens a pull request to merge code
     branches: [main]
-
 
 jobs:
   test:
-    runs-on: ubuntu-latest 
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v3
 
-    - name : Install Python  # Setup correct python version
-      uses : actions/setup-python@v4
+    - name: Install Python  # Setup correct python version
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
 
-    - name: Install Required Packages  #Install dependencies (Django, Pytest, etc.)
+    - name: Install Required Packages  # Install dependencies (Django, Pytest, etc.)
       run: |
         python -m pip install --upgrade pip
         pip install django pytest pytest-django
 
-     - name: Set up Database
-      run: | 
+    - name: Set up Database
+      run: |
         python backend/manage.py migrate
 
-      - name: Run Django test suite # run tests
-        run: | 
-          pytest
-
-
-      
+    - name: Run Django test suite  # run tests
+      run: |
+        pytest
