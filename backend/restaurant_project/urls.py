@@ -18,5 +18,6 @@ from django.contrib import admin
 from django.urls import path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('booking/',views.create_booking,name='create_booking'),
+    path('booking-suceess/',views.booking_success,name='booking_success'),
 ]
