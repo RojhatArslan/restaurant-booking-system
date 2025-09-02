@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title> Make a Booking</title>
+
+</head>
+<body>
+
+    <h1> Book a Table</h1>
+    {if form.errors %}
+        <p style="colour red;">Please fill in all fields correctly</p>
+    {% endif %}
+
+    <form method="post">
+        {csrf_token %} # to stop hackers from submitting fake forms
+        {{form.as_p}} #prints all the form fields in a paragraph
+
+        <button type="submit">Book Table</button>
+    </form>
+
+</body>
+
+</html>

@@ -4,7 +4,7 @@ from .forms import BookingForm
 #View function which sends the users booking form with a response back
 def create_bookings(request):
     if request.method == "POST":  
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST) #binds to the form
         if form.is_valid(): #If the user fills in all the required fields then it is saved
             form.save()
             return redirect('booking_success')
