@@ -31,3 +31,9 @@ jobs:
     - name: Run Django test suite  # run tests
       run: |
         pytest
+
+
+#Trigger: When you push code or open a pull request
+#Setup: Prepare the environment (install Python, Django, dependencies)
+#Run: Your migrations and tests
+#Result: GitHub shows if the tests passed or failed automatically
