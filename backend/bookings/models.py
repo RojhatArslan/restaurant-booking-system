@@ -1,37 +1,53 @@
 from django.db import models
-# reference  = https://medium.com/django-unleashed/integrating-core-object-oriented-programming-oop-concepts-in-django-powered-music-website-000766b5981f
-# Create your models here.
+from django.utils import timezone
+from datetime import time as t
 
-# i USED Django Django’s ORM (Object-Relational Mapping, which allows python objects to work with sql instead of writing raw sql
-class Customer(models.Model): #models.Model means Customer is a Django model, it matches to a table in the database.
-    first_name=models.CharField(max_length=50)
-    last_name=models.CharField(max_length=50)
-    email=models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=50)
+DAYS = [
+    (0, 'Monday'),
+    (1, 'Tuesday'),
+    (2, 'Wednesday'),
+    (3, 'Thursday'),
+    (4, 'Friday'),
+    (5, 'Saturday'),
+    (6, 'Sunday'),
+]
 
-    def __str__(self): # returns a string representing an object.
-        return f"{self.first_name} {self.last_name}"  # How this object shows up in admin or shell
+class RestaurantSettings(models.Model):
+    open_time = models.TimeField(default=t(10, 0))     # inclusive
+    close_time = models.TimeField(default=t(22, 0))    # exclusive
+    slot_minutes = models.PositiveIntegerField(default=60)
+    lead_time_minutes = models.PositiveIntegerField(default=30)
+    def __str__(self):
+        return f"Settings {self.open_time}-{self.close_time} / {self.slot_minutes}m"
 
+class SlotCapacity(models.Model):
+    day_of_week = models.PositiveSmallIntegerField(choices=DAYS)  # 0=Mon ... 6=Sun
+    time_of_day = models.TimeField(help_text="e.g. 17:00")
+    max_bookings = models.PositiveIntegerField(default=30)
 
-class Table(models.Model):
-    number=models.PositiveBigIntegerField(unique=True)
-    capacity = models.PositiveBigIntegerField()
-    def __str__(self): # returns a string representing an object.
-        return f"Table{self.number} (Capacity: {self.capacity}) " # refers to the table field on Booking
+    class Meta:
+        unique_together = ('day_of_week', 'time_of_day')
+        ordering = ('day_of_week', 'time_of_day')
+
+    def __str__(self):
+        return f"{self.get_day_of_week_display()} {self.time_of_day} ⇒ {self.max_bookings}"
+
 
 
 class Bookings(models.Model):
-    STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('confirmed','Confirmed'),
-        ('cancelled','Cancelled'),
+    name = models.CharField(max_length=100, blank=True, null=True)          # temporarily nullable
+    email = models.EmailField(blank=True, null=True)                        # already nullable
+    phone_number = models.CharField(max_length=50, blank=True, null=True)   # temporarily nullable
+    booking_datetime = models.DateTimeField()
+    status = models.CharField(max_length=10, choices=STATUS, default='pending')
 
-    ]
-    customer = models.ForeignKey(Customer,on_delete=models.CASCADE) # customer is a foreign key to Customer object
-    table = models.ForeignKey(Table,on_delete=models.CASCADE) #if the Customer or Table is deleted  the Booking will also be deleted automatically.
-    booking_datetime=models.DateTimeField()
-    party_size=models.PositiveIntegerField()
-    status=models.CharField(max_length=10,choices=STATUS_CHOICES,default='pending')
+    class Meta:
+        ordering = ['booking_datetime']
+        indexes = [models.Index(fields=['booking_datetime'])]
 
     def __str__(self):
-        return f"Booking for {self.customer} at {self.booking_datetime} on {self.table}" #calls the str method on the related customer which shows booking date and time, and table assigned
+        return f"{self.name} @ {self.booking_datetime} ({self.status})"
+
+    @staticmethod
+    def slot_start(dt, slot_minutes:int):
+        return dt.replace(minute=(dt.minute // slot_minutes) * slot_minutes, second=0, microsecond=0)

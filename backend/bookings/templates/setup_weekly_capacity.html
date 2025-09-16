@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Setup Weekly Capacity{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">Setup Weekly Capacity</h2>
+
+<p class="text-muted">
+  Opening hours: {{ settings.open_time }}–{{ settings.close_time }} • Slot size: {{ settings.slot_minutes }} minutes
+</p>
+
+<form method="POST" class="row g-3">
+  {% csrf_token %}
+  <div class="col-md-6">
+    <label class="form-label">{{ form.mon_thu_capacity.label }}</label>
+    {{ form.mon_thu_capacity }}
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">{{ form.fri_capacity.label }}</label>
+    {{ form.fri_capacity }}
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">{{ form.sat_capacity.label }}</label>
+    {{ form.sat_capacity }}
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">{{ form.sun_capacity.label }}</label>
+    {{ form.sun_capacity }}
+  </div>
+  <div class="col-12 form-check">
+    {{ form.overwrite }} <label class="form-check-label" for="{{ form.overwrite.id_for_label }}">{{ form.overwrite.label }}</label>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary">Create / Update Weekly Capacities</button>
+  </div>
+</form>
+
+<hr class="my-4"/>
+
+<p>
+  Tip: you can fine-tune individual slots later in <a href="/admin/">Admin</a> under <strong>Slot capacities</strong>.
+</p>
+{% endblock %}
